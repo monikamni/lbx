@@ -12,3 +12,8 @@ To set the project:
 - To get all the empolyees: GET http://127.0.0.1:8000/api/employee
 - To get perticular employee: GET http://127.0.0.1:8000/api/employee/198429
 - To delete employee record: DELETE http://127.0.0.1:8000/api/employee/198429
+
+
+## API Authentication
+We can use Laravel Passposrt or Sanctum for Authentication.
+I haven't added it yet.

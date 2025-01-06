@@ -28,6 +28,9 @@ class EmployeesController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
+        /**
+         * validating request
+         */
         $request->validate([
             'employees' => 'required|file|mimes:csv,txt'
         ]);
@@ -47,9 +50,12 @@ class EmployeesController extends BaseController {
                 ->skip(1)
                 ->chunk(1000)
                 ->each(function (LazyCollection $chunk) {
-
+                    
+                    /**
+                     * Mapping rows data
+                     */
                     $records = $chunk->map(function ($row) {
-                       return [
+                                return [
                             "emp_id" => $row[0],
                             "prefix" => $row[1],
                             "first_name" => $row[2],
@@ -69,7 +75,7 @@ class EmployeesController extends BaseController {
                             "zip" => $row[16],
                             "region" => $row[17],
                             "username" => $row[18]
-                        ];
+                                ];
                             })->toArray();
 
                     /**
@@ -84,24 +90,17 @@ class EmployeesController extends BaseController {
                      * by iterating each row. 
                      * But transaction will make the process faster
                      */
-//                    DB::beginTransaction();
+                    DB::beginTransaction();
                     foreach ($records as $record) {
-//                        print_r($record);
-//                        print_r(['emp_id' => $record['emp_id']]);exit;
-
-
                         try {
                             DB::table('employees')->updateOrInsert(['emp_id' => $record['emp_id']], $record);
                         } catch (Exception $ex) {
-                            echo 'DSEFSDGFDG';exit;
                             //error log   
                             logger('test');
                             continue;
                         }
-
-                        //DB::table('employees')->updateOrInsert(['emp_id' => $record['emp_id'], $record]);
                     }
-//                    DB::commit();
+                    DB::commit();
                 });
 
         return $this->sendResponse('', 'Employees data imported successfully.');
