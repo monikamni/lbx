@@ -38,7 +38,7 @@ class EmployeesController extends BaseController {
 
                     while (($line = fgetcsv($handle, 4096)) !== false) {
                         $dataString = implode(", ", $line);
-                        $row = explode(',', $dataString); 
+                        $row = explode(',', $dataString);
                         yield $row;
                     }
 
@@ -49,13 +49,7 @@ class EmployeesController extends BaseController {
                 ->each(function (LazyCollection $chunk) {
 
                     $records = $chunk->map(function ($row) {
-//                        echo date('H:i:s', strtotime($row[8]));
-//                        print_r($row);
-//                        if($row[0]==178566){
-//                            exit;
-//                        }
-                        
-                                return [
+                       return [
                             "emp_id" => $row[0],
                             "prefix" => $row[1],
                             "first_name" => $row[2],
@@ -75,10 +69,39 @@ class EmployeesController extends BaseController {
                             "zip" => $row[16],
                             "region" => $row[17],
                             "username" => $row[18]
-                                ];
+                        ];
                             })->toArray();
-//print_R($records[1]);exit;
-                    DB::table('employees')->insertOrIgnore($records);
+
+                    /**
+                     * If we want to ignore duplicate row, 
+                     * we can use insertOrIgnore function,
+                     * but it will never update the new value in database
+                     */
+//                    DB::table('employees')->insertOrIgnore($records);
+
+                    /**
+                     * So here i am using transaction to insert/update data
+                     * by iterating each row. 
+                     * But transaction will make the process faster
+                     */
+//                    DB::beginTransaction();
+                    foreach ($records as $record) {
+//                        print_r($record);
+//                        print_r(['emp_id' => $record['emp_id']]);exit;
+
+
+                        try {
+                            DB::table('employees')->updateOrInsert(['emp_id' => $record['emp_id']], $record);
+                        } catch (Exception $ex) {
+                            echo 'DSEFSDGFDG';exit;
+                            //error log   
+                            logger('test');
+                            continue;
+                        }
+
+                        //DB::table('employees')->updateOrInsert(['emp_id' => $record['emp_id'], $record]);
+                    }
+//                    DB::commit();
                 });
 
         return $this->sendResponse('', 'Employees data imported successfully.');

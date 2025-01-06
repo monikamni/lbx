@@ -15,7 +15,6 @@ use App\Http\Controllers\API\EmployeesController;
   |
  */
 
+
 Route::resource('employee', EmployeesController::class);
-//Route::middleware('auth:sanctum')->group(function () {
-//    Route::resource('employee', EmployeesController::class);
-//});
+
