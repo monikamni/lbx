@@ -1,5 +1,5 @@
 
-## About Laravel
+## Project installation
 To set the project:
 
 1. Clone project using git@github.com:monikamni/lbx.git URL
