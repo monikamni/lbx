@@ -94,7 +94,7 @@ class EmployeesController extends BaseController {
                     foreach ($records as $record) {
                         try {
                             DB::table('employees')->updateOrInsert(['emp_id' => $record['emp_id']], $record);
-                        } catch (Exception $ex) {
+                        } catch (\Illuminate\Database\QueryException $ex) {
                             //error log   
                             logger('test');
                             continue;
